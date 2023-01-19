@@ -5,6 +5,8 @@ DataCapture class has two attributes, the list of numbers and a dict for stats. 
 
 Before using greater, less and between methods is needed to execute **build_stats**
 
+This class only accepts numbers from 0 to 1000.
+
 ## Install the project
 First create a virtualenv
 ```
