@@ -1,4 +1,4 @@
-import numpy as np
+from collections import Counter
 
 
 class UninitializedStats(Exception):
@@ -22,6 +22,7 @@ class DataCapture:
         Initializes an instance of the class, creating an empty list for numbers and an empty dictionary for stats.
         """
         self.numbers = []
+        self.numbers_len = 0
         self.stats = {}
 
     def validate_element(self, number: int) -> None:
@@ -51,6 +52,7 @@ class DataCapture:
         """
         self.validate_element(number)
         self.numbers.append(number)
+        self.numbers_len += 1
 
     def build_stats(self) -> None:
         """
@@ -62,14 +64,17 @@ class DataCapture:
         Raises:
         ValueError: If the list of numbers is empty.
         """
-        if len(self.numbers) == 0:
+        if self.numbers_len == 0:
             raise ValueError("Empty number list, please add values")
-        numbers = range(0, 1001)
-        np_numbers = np.array(self.numbers)
-        self.stats = {
-            num: (np_numbers[np_numbers > num].size, np_numbers[np_numbers < num].size)
-            for num in numbers
-        }
+
+        count = [0] * 1001
+        for num in self.numbers:
+            count[num] += 1
+        self.stats = {}
+        for i in range(1, 1001):
+            count[i] += count[i - 1]
+        for i in range(1000, -1, -1):
+            self.stats[i] = (count[1000] - count[i], count[i - 1])
 
     def greater(self, number: int) -> int:
         """
@@ -130,4 +135,25 @@ class DataCapture:
             raise ValueError("Please insert valid interval")
         if not self.stats:
             raise UninitializedStats("Please execute build_stats")
-        return len(self.numbers) - self.greater(end_number) - self.less(start_number)
+        return self.numbers_len - self.greater(end_number) - self.less(start_number)
+
+
+if __name__ == "__main__":
+    """
+    Main function to test the DataCapture class.
+    """
+    data_capture = DataCapture()
+    data_capture.add(1)
+    data_capture.add(2)
+    data_capture.add(2)
+    data_capture.add(2)
+    data_capture.add(5)
+    data_capture.add(7)
+    data_capture.add(7)
+    data_capture.add(7)
+    data_capture.add(9)
+    data_capture.add(10)
+    data_capture.build_stats()
+    print(data_capture.greater(5))
+    print(data_capture.less(5))
+    print(data_capture.between(5, 10))
