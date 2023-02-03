@@ -20,6 +20,7 @@ class TestDataCapture(unittest.TestCase):
         """
         self.data_capture.add(10)
         self.assertEqual(self.data_capture.numbers, [10])
+        self.assertEqual(self.data_capture.numbers_len, 1)
 
     def test_add_invalid_number(self):
         """
